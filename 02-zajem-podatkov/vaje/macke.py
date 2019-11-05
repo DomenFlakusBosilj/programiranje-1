@@ -75,7 +75,11 @@ def read_file_to_string(directory, filename):
 def page_to_ads(page_content):
     """Funkcija poišče posamezne ogllase, ki se nahajajo v spletni strani in
     vrne njih seznam"""
-    raise NotImplementedError()
+    
+    exp = r'<div class="ad">(.*?)<div class="clear">'
+    expp = re.compile(exp, re.DOTALL)
+    
+    return re.findall(expp, page_content, re.DOTALL)
 
 
 # Definirajte funkcijo, ki sprejme niz, ki predstavlja oglas, in izlušči
