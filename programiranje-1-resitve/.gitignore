@@ -1,0 +1,17 @@
+02-zajem-podatkov/predavanja/zajeti-podatki
+
+*.pyc
+.ipynb_checkpoints
+
+*.byte
+*.cmo
+*.cmi
+*.cmx
+_build
+*.o
+
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.synctex.gz

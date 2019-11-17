@@ -8,6 +8,8 @@
  - : int = 4
 [*----------------------------------------------------------------------------*)
 
+let rec square' k = k * k
+
 let rec square k = k * k
 
 (*----------------------------------------------------------------------------*]
@@ -16,6 +18,9 @@ let rec square k = k * k
  # middle_of_triple (true, false, true);;
  - : bool = false
 [*----------------------------------------------------------------------------*)
+
+let rec middle_of_triple'' (x, y, z) = y
+  
 
 let rec middle_of_triple triple =
   let (x, y, z) = triple in
@@ -32,6 +37,11 @@ let rec middle_of_triple' (x,y,z) = y
  - : int = 1
 [*----------------------------------------------------------------------------*)
 
+let rec starting_element' = function
+  | [] -> failwith("prazen seznam")
+  | x :: xs -> x
+
+
 let rec starting_element list = 
   match list with
   | [] -> failwith "list is empty!"
@@ -44,6 +54,10 @@ let rec starting_element list =
  # multiply [2; 4; 6];;
  - : int = 48
 [*----------------------------------------------------------------------------*)
+
+let rec multiply'' = function
+  | [] -> 1
+  | x :: xs -> x * (multiply'' xs)
 
 let rec multiply list = 
   match list with
@@ -69,6 +83,14 @@ let rec multiply' = function
  - : int list = [-1; 7; 0]
 [*----------------------------------------------------------------------------*)
 
+let rec sum_int_pairs' = function
+  | [] -> []
+  | (x1,x2) :: xs -> 
+    let sum = x1 + x2 in
+    let sum_ostali = sum_int_pairs' xs in
+    sum :: sum_ostali
+
+
 let rec sum_int_pairs = function
   | [] -> []
   | (x1, x2) :: xs -> 
@@ -85,6 +107,11 @@ let rec sum_int_pairs = function
  - : int = 1
 [*----------------------------------------------------------------------------*)
 
+let rec get' k = function
+  | [] -> failwith("Prekratek seznam")
+  | x :: xs -> if k <= 0 then x else get' (k-1) xs 
+
+
 let rec get k = function
   | [] -> failwith "List to short!"
   | x :: xs -> if k <= 0 then x else get (k-1) xs
@@ -95,6 +122,11 @@ let rec get k = function
  # double [1; 2; 3];;
  - : int list = [1; 1; 2; 2; 3; 3]
 [*---------------------------------------------------------------------------- *)
+
+let rec double' = function
+  | [] -> []
+  | x :: xs -> x :: x :: double' xs
+
 
 let rec double = function
   | [] -> []
@@ -110,6 +142,11 @@ let rec double = function
  # insert 1 (-2) [0; 0; 0; 0; 0];;
  - : int list = [1; 0; 0; 0; 0; 0]
 [*---------------------------------------------------------------------------- *)
+
+let rec insert' x k = function
+  | [] -> [x]
+  | y :: ys -> if k <= 0 then x :: y :: ys else y :: insert' x (k-1) ys
+
 
 let rec insert x k = function
   | [] -> [x]
@@ -129,6 +166,14 @@ let rec insert x k = function
  - : int list * int list = ([1; 2; 3; 4; 5], [])
 [*----------------------------------------------------------------------------*)
 
+let rec divide' k = function
+  | [] -> ([], [])
+  | x :: xs when k <= 0 -> ([], x :: xs)
+  | x :: xs ->
+    let left, right = divide' (k-1) xs in
+    (x :: left, right)
+
+
 let rec divide k = function
   | [] -> ([], [])
   | x :: xs when k <= 0 -> ([], x :: xs)
@@ -143,6 +188,11 @@ let rec divide k = function
  # rotate 2 [1; 2; 3; 4; 5];;
  - : int list = [3; 4; 5; 1; 2]
 [*----------------------------------------------------------------------------*)
+
+let rec rotate' n = function
+  | [] -> []
+  | x :: xs -> if n > 0 then rotate' (n-1) (xs @ [x]) else x :: xs
+
 
 let rec rotate n = function
   | [] -> []
@@ -159,7 +209,9 @@ let rec rotate n = function
  - : int list = [2; 3; 2; 3]
 [*----------------------------------------------------------------------------*)
 
-let rec remove = function
+let rec remove x = function
+  | [] -> []
+  | y :: ys -> if y = x then remove x ys else y :: remove x ys
 
 (*----------------------------------------------------------------------------*]
  Funkcija [is_palindrome] za dani seznam ugotovi ali predstavlja palindrom.
@@ -171,7 +223,12 @@ let rec remove = function
  - : bool = false
 [*----------------------------------------------------------------------------*)
 
-let rec is_palindrome = ()
+let rec is_palindrome list = 
+  let rec obrni = function
+    | [] -> []
+    | x :: xs -> obrni xs @ [x]
+  in
+  obrni list = list
 
 (*----------------------------------------------------------------------------*]
  Funkcija [max_on_components] sprejme dva seznama in vrne nov seznam, katerega
@@ -182,7 +239,10 @@ let rec is_palindrome = ()
  - : int list = [5; 4; 3; 3; 4]
 [*----------------------------------------------------------------------------*)
 
-let rec max_on_components = ()
+let rec max_on_components list1 list2 = 
+  match (list1, list2) with
+    | (x :: xs, y :: ys) -> max x y :: max_on_components xs ys
+    | _ -> []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [second_largest] vrne drugo največjo vrednost v seznamu. Pri tem se
@@ -194,4 +254,20 @@ let rec max_on_components = ()
  - : int = 10
 [*----------------------------------------------------------------------------*)
 
-let rec second_largest = ()
+(* let rec remove x = function
+  | [] -> []
+  | y :: ys -> if y = x then remove x ys else y :: remove x ys
+
+let rec second_largest = 
+  let rec max_seznama = function
+    | [] -> failwith"List too short!"
+    | x :: [] -> x
+    | x :: xs -> max x (max_seznama xs)
+  in
+  let rec remove x = function
+  | [] -> []
+  | y :: ys -> if y = x then remove x ys else y :: remove x ys
+  in
+  max_seznama (remove max_seznama) *)
+
+  
