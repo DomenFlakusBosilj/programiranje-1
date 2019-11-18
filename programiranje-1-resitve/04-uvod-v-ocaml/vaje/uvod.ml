@@ -17,6 +17,9 @@ let rec square x = x * x
  - : bool = false
 [*----------------------------------------------------------------------------*)
 
+let rec middle_of_triple1 = function
+  | (x,y,z) -> y
+
 let rec middle_of_triple triple =
   let (x, y, z) = triple in
   y
@@ -60,6 +63,11 @@ let rec multiply = function
  - : int list = [-1; 7; 0]
 [*----------------------------------------------------------------------------*)
 
+let rec sum_int_pairs1 = function
+  | [] -> []
+  | (x,y) :: tl -> (x+y) :: sum_int_pairs1 tl
+
+
 let rec sum_int_pairs = function
   | [] -> []
   | (x, y) :: pairs -> (x + y) :: sum_int_pairs pairs
@@ -72,6 +80,10 @@ let rec sum_int_pairs = function
  # get 2 [0; 0; 1; 0; 0; 0];;
  - : int = 1
 [*----------------------------------------------------------------------------*)
+
+let rec get1 k = function
+  | [] -> failwith "List too short"
+  | x :: xs -> if k <= 0 then x else get1 (k-1) xs
 
 let rec get k = function
   | [] -> failwith "List is too short."
@@ -87,6 +99,19 @@ let rec get k = function
 let rec double = function
   | x :: xs -> x :: x :: double xs
   | [] -> []
+
+
+let rec obrni = function
+  | [] -> []
+  | x :: xs -> obrni xs @ [x]
+
+let rec double2 list =
+  let rec double2_aux acc = function
+    | [] -> obrni acc
+    | x :: xs -> double2_aux (x :: x :: acc) xs
+  in
+  double2_aux [] list
+
 
 (*----------------------------------------------------------------------------*]
  Funkcija [insert x k list] na [k]-to mesto seznama [list] vrine element [x].
@@ -185,10 +210,10 @@ let rec max_on_components list1 list2 =
  - : int = 10
 [*----------------------------------------------------------------------------*)
 
-let second_largest list =
+(* let second_largest list =
   let rec largest = function
     | [] -> failwith "List is too short."
 	  | x :: [] -> x
 	  | x :: xs -> max x (largest xs)
   in
-  largest (delete (largest list) list)
+  largest (delete (largest list) list) *)

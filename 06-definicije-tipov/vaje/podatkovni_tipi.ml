@@ -57,6 +57,12 @@ let to_yen = function
   | Krona f -> Yen (f *. 2.3)
   | Tolar f -> Yen (f *. 102.4)
 
+let to_pound = function
+  | Pound f -> Pound f
+  | Yen f -> Pound (f *. 0.0071)
+  | Krona f -> Pound (f *. 0.08)
+  | Tolar f -> Pound (f *. 0.004)
+
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Želimo uporabljati sezname, ki hranijo tako cela števila kot tudi logične
  vrednosti. To bi lahko rešili tako da uvedemo nov tip, ki predstavlja celo
@@ -68,7 +74,6 @@ let to_yen = function
  x :: xs v Ocamlu).
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
 
-
 (*----------------------------------------------------------------------------*]
  Definirajte tip [intbool_list] z konstruktorji za:
   1.) prazen seznam,
@@ -77,6 +82,13 @@ let to_yen = function
 
  Nato napišite testni primer, ki bi predstavljal "[5; true; false; 7]".
 [*----------------------------------------------------------------------------*)
+
+type intbool_list1 =
+  | Nil
+  | Int of int * intbool_list1
+  | Bool of bool * intbool_list1
+
+
 
 type intbool_list =
   | Nil
@@ -250,3 +262,4 @@ let find_candidate magic specialisation wizard_list =
         | _ -> search wizards
   in
   search wizard_list
+

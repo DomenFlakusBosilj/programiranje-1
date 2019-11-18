@@ -39,6 +39,7 @@ let euro_to_dollar (Euro x) = Dollar (x *. 1.161)
  - : currency = Pound 0.007
 [*----------------------------------------------------------------------------*)
 
+(* VSOTNI TIP *)
 type currency = Yen of float | Pound of float | Krona of float
 
 let to_pound = function
@@ -166,6 +167,7 @@ let professor = {name = "Matija"; status = Employed(Fire, Teacher)}
  - : magic_counter = {fire = 1; frost = 1; arcane = 2}
 [*----------------------------------------------------------------------------*)
 
+(* ZAPISNI TIP *)
 type magic_counter = {fire : int; frost : int; arcane : int}
 
 let update counter = function
