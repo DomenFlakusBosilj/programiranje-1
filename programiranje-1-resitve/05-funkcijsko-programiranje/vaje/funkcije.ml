@@ -4,6 +4,25 @@
 Namig: Definirajte pomožno funkcijo za obračanje seznamov.
 [*----------------------------------------------------------------------------*)
 
+let rec reverse1 list =
+  let rec reverse_aux1 acc = function
+    
+  in
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 let reverse list =
   let rec reverse_aux acc = function
     | [] -> acc

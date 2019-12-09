@@ -9,6 +9,14 @@
  val l : int list = [0; 1; 0; 4; 0; 9; 1; 2; 5; 4]
 [*----------------------------------------------------------------------------*)
 
+let rec randlist len max =
+    let rec listgen len acc =
+        if len <= 0 then 
+            acc
+        else 
+            listgen (len-1) (Random.int max :: acc)
+    in
+    listgen len []
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Sedaj lahko s pomočjo [randlist] primerjamo našo urejevalno funkcijo (imenovana
@@ -18,6 +26,10 @@
  let test = (randlist 100 100) in (our_sort test = List.sort compare test);;
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
 
+let rec tester our_sort len =
+    (* pove ali funkcija [our_sort] pravilno uredi nakljucni seznam dolzine [len] *)
+    let test = randlist len 10000 in
+    our_sort test = List.sort compare test
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*]
  Urejanje z Vstavljanjem
@@ -35,13 +47,41 @@
  - : int list = [7]
 [*----------------------------------------------------------------------------*)
 
+let rec insert y = function
+    | [] -> [y]
+    | x :: xs -> if x < y then x :: insert y xs else y :: x :: xs
+
+let rec insert_tlrec y xs =
+    let rec insert' acc = function
+        | [] -> List.rev (y :: acc)
+        | x :: xs ->
+            if x < y then
+                insert' (x :: acc) xs
+            else
+                (* List.rev_append xs ys ~ (List.rev xs) @ ys ampak tail redcursive *)
+                List.rev_append (y :: acc) (x :: xs)
+    in
+    insert' [] xs 
+
 
 (*----------------------------------------------------------------------------*]
  Prazen seznam je že urejen. Funkcija [insert_sort] uredi seznam tako da
  zaporedoma vstavlja vse elemente seznama v prazen seznam.
 [*----------------------------------------------------------------------------*)
 
+let rec insert_sort xs = 
+    List.fold_left (fun ys y -> insert_tlrec y ys) [] xs
 
+let rec insert_sort_bad = function
+    | [] -> []
+    | x :: xs -> (insert_sort_bad xs)
+
+let rec insert_sort_tlrec xs =
+    let rec sort' acc = function
+        | [] -> acc
+        | x :: xs -> sort' (insert_tlrec x acc) xs
+    in
+    sort' [] xs
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*]
  Urejanje z Izbiranjem
@@ -53,6 +93,38 @@
  pojavitvijo elementa [z]. V primeru praznega seznama vrne [None]. 
 [*----------------------------------------------------------------------------*)
 
+let rec min_and_rest = function
+    | [] -> None
+    | x :: xs ->
+        let rec get_min acc rest = function
+            | [] -> (acc, rest)
+            | y :: ys ->
+                if acc < y then
+                    get_min acc (y :: rest) ys
+                else
+                    get_min y (acc :: rest) ys
+                    (* vrstni red elementov v rest je morda drugacen ampak mi je vseeno *)
+        in
+        Some (get_min x [] xs)
+
+
+let rec min_and_rest_2 xs = 
+    let rec get_min default = function
+        | [] -> default
+        | x :: xs -> min x (get_min default xs)
+    in
+    let rec remove y = function
+        | [] -> []
+        | x :: xs when x = y -> xs
+        | x :: xs -> x :: remove y xs
+    in
+    match xs with
+        | [] -> None
+        | x :: xs ->
+            let m = get_min x xs in
+            let rest = remove m (x :: xs) in
+            Some (m, rest)
+    
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Pri urejanju z izbiranjem na vsakem koraku ločimo dva podseznama, kjer je prvi
@@ -72,7 +144,10 @@
  Namig: Uporabi [min_and_rest] iz prejšnje naloge.
 [*----------------------------------------------------------------------------*)
 
-
+let rec selection_sort xs =
+    match min_and_rest xs with
+        | None -> []
+        | Some (m, rest) -> m :: selection_sort rest
 
 (*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*]
  Urejanje z Izbiranjem na Tabelah
@@ -101,14 +176,38 @@
  - : int array = [|0; 4; 2; 3; 1|]
 [*----------------------------------------------------------------------------*)
 
+let swap a i j =
+    let ai = a.(i) in
+    a.(i) <- a.(j);
+    a.(j) <- ai
+
+let swap a i j =
+    let ai = a.(i) in
+    let () = a.(i) <- a.(j) in
+    let () = a.(j) <- ai in
+    ()
 
 (*----------------------------------------------------------------------------*]
  Funkcija [index_min a lower upper] poišče indeks najmanjšega elementa tabele
  [a] med indeksoma [lower] and [upper] (oba indeksa sta vključena).
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
- index_min [|0; 2; 9; 3; 6|] 2 4 = 4
+ index_min [|0; 2; 9; 3; 6|] 2 4 = 3
 [*----------------------------------------------------------------------------*)
 
+let index_min a lower upper =
+    let rec search mini i =
+        if i > upper then
+        (* koncali iskanje *)
+            mini
+        else if a.(i) < a.(mini) then
+        (* nasli najmanjsi element, posodobi indeks minimuma *)
+            search i (i+1)
+        else
+        (* nezanimiv elemen, isci dalje *)
+            search mini (i+1)
+    in
+    (* zacni iskanje pri [lower] kjer je najmanjsi do sedaj videni element prav tako na indeksu [lower] *)
+    search lower lower
 
 (*----------------------------------------------------------------------------*]
  Funkcija [selection_sort_array] implementira urejanje z izbiranjem na mestu. 
@@ -117,3 +216,24 @@
  skupaj z [randlist].
 [*----------------------------------------------------------------------------*)
 
+let rec selection_sort_array a =
+    let len = Array.length a in
+    let rec sorter lower =
+        if lower >= len then
+            (* everything is sorted *)
+            ()
+        else
+            (* find the minimal element in the rest of the list and swap it with the element 
+            on the lower end of the 'to be sorted' part of the list*)
+            let mini = index_min a lower (len-1) in
+            let () = swap a lower mini in 
+            (* sort the rest of the list *)
+            sorter (lower+1)
+    in
+    sorter 0
+
+let rec array_tester our_sort len =
+    let test = randlist len 10000 in
+    let test_array = Array.of_list test in
+    let () = our_sort test_array in
+    Array.to_list test_array = List.sort compare test
