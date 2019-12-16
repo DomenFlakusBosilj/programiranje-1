@@ -27,6 +27,24 @@
 #     [10, 2, 0, 4, 11, 15, 17, 5, 18]
 ###############################################################################
 
+def pivot (a, start, end):
+    if end <= start:
+        #nothing to do, bad input
+        return start
+    p = a[start]
+    # we have an index that tells us where the first element larger than the pivot is
+    # and we maintain that invariant throughout the loop
+    first_larger = start + 1
+    for i in range(start, end+1):
+        if a[i] < a[start]:
+            #this element need to end up on the left side of the pivot
+            a[first_larger], a[i] = a[i], a[first_larger]
+            # switch it with the 'first_larger' element and update that index
+            first_larger += 1
+    #move the pivot to the right place
+    #we dwap its position with the last smller element
+    a[start], a[first_larger-1], = a[first_larger-1], a[start]
+    return first_larger - 1
 
 
 ###############################################################################
@@ -44,6 +62,32 @@
 # jo rešite brez da v celoti uredite tabelo [a].
 ###############################################################################
 
+def kth_element_with_loop (a, k):
+    lower = 0
+    upper = len(a) - 1
+    while True:
+        #see if the first element of the sublist is thr k-th
+        candidate_i = pivot(a, lower, upper)
+        if candidate_i == k:
+            return a[candidate_i]
+        elif candidate_i < k:
+            #we continue searching amongst larger elements
+            lower = candidate_i + 1
+        else:
+            #we continue searching amongst smaller elements
+            upper = candidate_i - 1
+
+
+def kth_element_with_recursion (a, k):
+    def kth(lower, upper):
+        candidate_i = pivot(a, lower, upper)
+        if candidate_i == k:
+            return a[candidate_i]
+        elif candidate_i < k:
+            return kth(candidate_i + 1, upper)
+        else:
+            return kth(lower, candidate_i - 1)
+    return kth(0, len(a) - 1)
 
 
 ###############################################################################
